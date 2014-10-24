@@ -1,44 +1,54 @@
 
-var avgTimes = {},
-    averagers = {},
-    config = { short: 100, long: 1000 };
+var defaultConfig = { short: 100, long: 1000 };
 
-module.exports = {
-    start: function startTime(name) {
-        var start = +(new Date()),
-            stopped = false;
+function Timing(config) {
+    this.config = config;
 
-        return function stopTime() {
-            if (stopped) return;
-            stopped = true;
+    this.avgTimes = {};
+    this.averagers = {};
+}
 
-            var stop = +(new Date());
+Timing.prototype.start = function startTime(name) {
+    var timing = this,
+        start = +(new Date()),
+        stopped = false;
 
-            averagers[name] = averagers[name] || newStat(name, module.exports.config);
+    return function stopTime() {
+        if (stopped) return;
+        stopped = true;
 
-            Object.keys(avgTimes[name]).forEach(function (key) {
-                avgTimes[name][key] = averagers[name][key](stop - start);
-            });
-        };
-    },
-    stats: function getStats(key) {
-        if (typeof key != 'undefined') return avgTimes[key];
-        return avgTimes;
-    },
-    config: config
+        var stop = +(new Date());
+
+        timing.averagers[name] = timing.averagers[name] || timing._newStat(name);
+
+        Object.keys(timing.avgTimes[name]).forEach(function (key) {
+            timing.avgTimes[name][key] = timing.averagers[name][key](stop - start);
+        });
+    };
 };
 
-function newStat(name, config) {
-    var stat = {};
-    avgTimes[name] = {};
+Timing.prototype.stats = function getStats(key) {
+    if (typeof key != 'undefined') return this.avgTimes[key];
+    return this.avgTimes;
+};
 
-    Object.keys(config).forEach(function (key) {
-        stat[key] = new SimpleMovingAverager(config[key]);
-        avgTimes[name][key] = null;
+Timing.prototype._newStat = function _newStat(name) {
+    var timing = this,
+        stat = {};
+
+    this.avgTimes[name] = {};
+
+    Object.keys(this.config).forEach(function (key) {
+        stat[key] = new SimpleMovingAverager(timing.config[key]);
+        timing.avgTimes[name][key] = null;
     });
 
     return stat;
-}
+};
+
+Timing.Timing = Timing;
+
+module.exports = new Timing(defaultConfig);
 
 // Implementation from http://rosettacode.org/wiki/Averages/Simple_moving_average#JavaScript
 function SimpleMovingAverager(period) {
