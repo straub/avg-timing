@@ -46,7 +46,7 @@ Timing.prototype._newStat = function _newStat(name) {
     return stat;
 };
 
-Timing.Timing = Timing;
+Timing.prototype.Timing = Timing;
 
 module.exports = new Timing(defaultConfig);
 
