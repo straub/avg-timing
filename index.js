@@ -1,8 +1,6 @@
 
-var defaultConfig = { short: 100, long: 1000 };
-
 function Timing(config) {
-    this.config = config;
+    this.config = config || { short: 100, long: 1000 };
 
     this._stats = {};
     this._averagers = {};
@@ -48,7 +46,7 @@ Timing.prototype._newStat = function _newStat(name) {
 
 Timing.prototype.Timing = Timing;
 
-module.exports = new Timing(defaultConfig);
+module.exports = new Timing();
 
 // Implementation from http://rosettacode.org/wiki/Averages/Simple_moving_average#JavaScript
 function SlightlyMoreComplexMovingAverager(period) {
