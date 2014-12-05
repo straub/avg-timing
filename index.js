@@ -59,7 +59,7 @@ function SlightlyMoreComplexMovingAverager(period) {
     return function (num) {
         nums.push(num);
         if (nums.length > period) {
-            nums.splice(0,1);  // remove the first element of the array
+            nums.shift();  // remove the first element of the array
         }
         var sum = 0;
         for (var i in nums) {
