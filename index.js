@@ -11,9 +11,11 @@ Timing.prototype.start = function startTime(name) {
         start = +(new Date()),
         stopped = false;
 
-    return function stopTime() {
+    return function _stopTime() {
         if (stopped) return;
         stopped = true;
+
+        name = _stopTime.statName || name;
 
         var stop = +(new Date());
 
