@@ -11,20 +11,26 @@ Timing.prototype.start = function startTime(name) {
         start = +(new Date()),
         stopped = false;
 
-    return function _stopTime() {
+    var _stopTime = function _stopTime() {
         if (stopped) return;
         stopped = true;
 
-        name = _stopTime.statName || name;
+        var statName = _stopTime.statName,
+            stop = +(new Date()),
+            time = stop - start;
 
-        var stop = +(new Date());
+        timing._averagers[statName] = timing._averagers[statName] || timing._newStat(statName);
 
-        timing._averagers[name] = timing._averagers[name] || timing._newStat(name);
-
-        Object.keys(timing._stats[name]).forEach(function (key) {
-            timing._stats[name][key] = timing._averagers[name][key](stop - start);
+        Object.keys(timing._stats[statName]).forEach(function (key) {
+            timing._stats[statName][key] = timing._averagers[statName][key](time);
         });
+
+        return time;
     };
+
+    _stopTime.statName = name;
+
+    return _stopTime;
 };
 
 Timing.prototype.stats = function getStats(key) {
